@@ -1,0 +1,51 @@
+{
+  "query": {
+    "bool": {
+      "must":  [
+        {
+          "match": {
+            "title": {
+              "query": "star",
+              "fuzziness": "AUTO"
+            }
+          }
+        },
+        {
+          "nested": {
+            "path": "genre",
+            "query": {
+              "bool": {
+                "must":[
+                  {
+                    "match": {
+                      "genre.name": {
+                        "query": "Family",
+                        "fuzziness": "AUTO"
+                      }
+                    }
+                  }
+                ],
+                "filter":
+                {"term": {
+                  "genre.id": "55c723c1-6d90-4a04-a44b-e9792040251a"
+                }
+                }
+
+              }
+            }
+          }
+        }
+      ],
+      "filter": {
+        "ids": {
+          "values": ["b2faef9b-ad43-455c-9ea5-9d5977c84b73","22d50530-14d5-483e-a063-246e92c8c14f"]
+        }
+      }
+    }
+  },
+  "sort" :
+  { "imdb_rating" : "desc" }
+,
+  "size": 10,
+  "from": 0
+}
