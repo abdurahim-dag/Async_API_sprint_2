@@ -1,0 +1,41 @@
+# Russian translations for movies.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the movies project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: movies 0.0.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-12-19 20:03+0300\n"
+"PO-Revision-Date: 2022-12-19 20:03+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.11.0\n"
+
+#: models/messages.py:6
+msgid "film not found"
+msgstr ""
+
+#: models/messages.py:7 models/messages.py:13
+msgid "films not found"
+msgstr ""
+
+#: models/messages.py:12
+msgid "genre not found"
+msgstr ""
+
+#: models/messages.py:18
+msgid "person not found"
+msgstr ""
+
+#: models/messages.py:19
+msgid "persons not found"
+msgstr ""
+

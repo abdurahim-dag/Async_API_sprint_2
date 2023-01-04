@@ -1,10 +1,22 @@
+"""Модуль ожидающий принятия соединения от ES."""
+import sys
 import time
+import asyncio
+from logger import logger
+from elasticsearch import AsyncElasticsearch
 
-from elasticsearch import Elasticsearch
+sys.path.append(f"{sys.path[0]}/..")
+from settings import test_settings
+
+
+async def check():
+    es_client = AsyncElasticsearch(hosts=test_settings.es_conn_str, validate_cert=False, use_ssl=False)
+    while True:
+        if await es_client.ping():
+            break
+        logger.error("Expectation ES online %s", test_settings.es_conn_str)
+        time.sleep(1)
+    await es_client.close()
 
 if __name__ == '__main__':
-    es_client = Elasticsearch(hosts='http://localhost:9200', validate_cert=False, use_ssl=False)
-    while True:
-        if es_client.ping():
-            break
-        time.sleep(1)
+    asyncio.run(check())
