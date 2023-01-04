@@ -66,9 +66,10 @@ https://github.com/abdurahim-dag/Async_API_sprint_2
    - для tests: docker-compose.yml, docker-compose.tests.yml;
 
 # Порядок запуска dev (Windows 10):
-1. docker compose --env-file ./.env.dev up -d --no-deps --build
-2. Если первый запуск, то одной командой в WSL: make windows-dev-post-start
-3. Если надо сразу перенести данные PG в ES, а не ждать события ETL:
+1. Создаём .env.dev на сонове .env.example. Редактируем .env.dev подводя его к dev(APP_USER=root)
+2. docker compose --env-file ./.env.dev up -d --no-deps --build
+3. Если первый запуск, то одной командой в WSL: make windows-dev-post-start
+4. Если надо сразу перенести данные PG в ES, а не ждать события ETL:
    - Войти в терминал docker etl-movie.
    - Запустить ETL в папке(CWD: /app) - /app/run.sh
 
@@ -80,12 +81,13 @@ https://github.com/abdurahim-dag/Async_API_sprint_2
 При запуске не забыть указать env-file: env.prod(такой же как env.example).
 
 # Порядок запуска tests:
-1. make start-tests
-2. Смотрим лог контейнера.
-3. docker compose down -v
+1. Создаём .env.dev на сонове .env.example. Редактируем .env.dev подводя его к dev(APP_USER=root)
+2. make start-tests
+3. Смотрим лог контейнера.
+4. docker compose down -v
 
 # В случаи проблем при запуске Docker compose, добавьте --no-deps --build:
    - удалить образы и volumes;
    - docker compose --env-file ./.env.dev up -d --no-deps --build
    - docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file ./.env.prod up -d --no-deps --build
-   - возможно при первом старте нужно использовать впн(есть ситуация при использовании впн возникает ошибка аутентификации в докер хаб, при такой ошибке отключаем впн и опять строим бразы) 
+   - возможно при первом старте нужно использовать впн(есть ситуация при использовании впн возникает ошибка аутентификации в докер хаб, после создания некоторых образов, при такой ошибке отключаем впн и опять строим бразы) 
