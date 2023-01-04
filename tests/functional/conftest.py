@@ -1,6 +1,7 @@
 """Модуль фикстур"""
 import pytest_asyncio
 import pytest
+import dataclasses
 import aiohttp
 from redis import asyncio as redisio
 import asyncio
@@ -82,5 +83,6 @@ async def make_get_request(client_session):
     """Собственно запрос к API посредством aiohttp сессии."""
     async def go(url, params=None):
         async with client_session.get(url=url, params=params) as response:
-            return await response.json()
+            response.json = await response.json()
+            return response
     return go

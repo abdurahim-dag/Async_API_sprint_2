@@ -1,7 +1,7 @@
 """Модуль ожидающий принятия соединения от Redis."""
 import sys
 import time
-
+from logger import logger
 from redis import asyncio as redisio
 from redis.exceptions import ConnectionError
 import asyncio
@@ -18,6 +18,7 @@ async def check():
                 await connection.ping()
                 break
             except ConnectionError:
+                logger.error("Expectation ES online %s", test_settings.redis_conn_str)
                 time.sleep(1)
             except Exception as e:
                 raise e
