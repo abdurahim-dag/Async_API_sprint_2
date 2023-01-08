@@ -15,7 +15,7 @@ services:
       - ./app:/app
     env_file: .env.dev
     ports:
-      - "8000:8000"
+      - "8000:8080"
     restart: unless-stopped
 
   swagger-eidtor:
@@ -50,7 +50,7 @@ services:
       - ./fastapi-solution/src:/app
     env_file: .env.dev
     ports:
-      - "8080:8000"
+      - "8080:8080"
     restart: always
 
   redis:

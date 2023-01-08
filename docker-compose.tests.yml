@@ -44,7 +44,7 @@ services:
       - ./fastapi-solution/src:/app
     env_file: .env.dev
     ports:
-      - "8080:8000"
+      - "8080:8080"
     restart: always
 
   redis:

@@ -61,25 +61,27 @@ class Service(ABC):
         которая должна возвращать поле для сортировки.
         """
         body = self._build_query_body_()
-        query = self._build_query()
-        body.query = query
 
-        if params.ids:
-            if not query.bool:
-                query.bool = self._build_query_bool()
+        if params.query:
+            query = self._build_query()
+            body.query = query
 
-            values = [
-                str(_id) for _id in params.ids
-            ]
-            ids_values = self._build_ids_values(values=values)
-            query.bool.filter = self._build_query_ids(ids=ids_values)
+            if params.ids:
+                if not query.bool:
+                    query.bool = self._build_query_bool()
 
-        if params.sort:
-            if params.sort.startswith('-'):
-                order = es_query.OrderEnum.DESC
-            else:
-                order = es_query.OrderEnum.ASC
-            body.sort = self._build_query_order(order=order)
+                values = [
+                    str(_id) for _id in params.ids
+                ]
+                ids_values = self._build_ids_values(values=values)
+                query.bool.filter = self._build_query_ids(ids=ids_values)
+
+            if params.sort:
+                if params.sort.startswith('-'):
+                    order = es_query.OrderEnum.DESC
+                else:
+                    order = es_query.OrderEnum.ASC
+                body.sort = self._build_query_order(order=order)
 
         body.size = params.page_size
         body.from_ = params.page_num

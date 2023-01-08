@@ -1,7 +1,6 @@
 """Модуль фикстур"""
 import pytest_asyncio
 import pytest
-import dataclasses
 import aiohttp
 from redis import asyncio as redisio
 import asyncio
