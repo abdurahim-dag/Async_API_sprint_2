@@ -49,3 +49,35 @@ film_test_settings = TestESIndexSettings(
         )
     )
 )
+
+genre_test_settings = TestESIndexSettings(
+    index_name='genre',
+    schema_file_path=Path(
+        PurePath(
+            'testdata',
+            'es_schema_genres.json'
+        )
+    ),
+    data_file_path=Path(
+        PurePath(
+            'testdata',
+            'genres.json'
+        )
+    )
+)
+
+person_test_settings = TestESIndexSettings(
+    index_name='person',
+    schema_file_path=Path(
+        PurePath(
+            'testdata',
+            'es_schema_persons.json'
+        )
+    ),
+    data_file_path=Path(
+        PurePath(
+            'testdata',
+            'persons.json'
+        )
+    )
+)
