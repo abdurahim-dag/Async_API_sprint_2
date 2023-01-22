@@ -1,4 +1,7 @@
 """Модуль фикстур"""
+import logging
+
+import elasticsearch
 import pytest_asyncio
 import pytest
 import aiohttp
@@ -9,6 +12,7 @@ import linecache
 from contextlib import closing
 from elasticsearch import AsyncElasticsearch
 from .settings import TestESIndexSettings, test_settings
+from typing import Generator
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -18,19 +22,23 @@ def event_loop():
     loop.close()
 
 @pytest_asyncio.fixture(scope='session')
-async def es_client():
+async def es_client() -> Generator[AsyncElasticsearch, None, None]:
     """Создадим экземпляр асинхронного клиента ES, для всей сессии."""
     client = AsyncElasticsearch(hosts=[test_settings.es_conn_str])
     yield client
     await client.close()
 
 @pytest_asyncio.fixture(scope='session')
-async def es_init(es_client, request):
+async def es_init(es_client: AsyncElasticsearch, request):
     """Инициализация индекса."""
     settings: TestESIndexSettings = request.param
     index_name = settings.index_name
     with closing(open(settings.schema_file_path, 'rt', encoding='utf-8')) as findex:
         body = findex.read()
+        try:
+            await es_client.indices.delete([index_name])
+        except elasticsearch.exceptions.NotFoundError as e:
+            pass
         # Создадим индекс.
         await es_client.indices.create(
             index=index_name,
@@ -82,6 +90,7 @@ async def make_get_request(client_session):
     """Собственно запрос к API посредством aiohttp сессии."""
     async def go(url, params=None):
         async with client_session.get(url=url, params=params) as response:
+            print(url)
             response.json = await response.json()
             return response
     return go
