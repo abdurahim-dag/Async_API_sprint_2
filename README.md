@@ -76,9 +76,8 @@ https://github.com/abdurahim-dag/Async_API_sprint_2
 # Порядок запуска prod:
 1. make start-prod
 2. Если надо сразу перенести данные PG в ES, а не ждать события ETL:
-   - Войти в терминал docker etl-movie.
-   - Запустить ETL в папке(CWD: /app) - /app/run.sh
-При запуске не забыть указать env-file: env.prod(такой же как env.example).
+   - docker exec -it etl-movie bash -c "/app/run.sh" 
+   При запуске не забыть указать env-file: env.prod(такой же как env.example).
 
 # Порядок запуска tests:
 1. Создаём .env.dev на сонове .env.example. Редактируем .env.dev подводя его к dev(APP_USER=root)
@@ -90,4 +89,4 @@ https://github.com/abdurahim-dag/Async_API_sprint_2
    - удалить образы и volumes;
    - docker compose --env-file ./.env.dev up -d --no-deps --build
    - docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file ./.env.prod up -d --no-deps --build
-   - возможно при первом старте нужно использовать впн(есть ситуация при использовании впн возникает ошибка аутентификации в докер хаб, после создания некоторых образов, при такой ошибке отключаем впн и опять строим бразы) 
+   - возможно при первом старте нужно использовать впн(есть ситуация при использовании впн возникает ошибка аутентификации в докер хаб, после создания некоторых образов, при такой ошибке отключаем впн и опять строим бразы)

@@ -81,7 +81,7 @@ def random_line(request):
 def count_testdata(request):
     fpath=request.param
     num_lines = len(open(fpath, 'rt', encoding='utf-8').readlines()) - 1
-    return num_lines
+    return num_lines / 2
 
 
 @pytest_asyncio.fixture(scope='session')

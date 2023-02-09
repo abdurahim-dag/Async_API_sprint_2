@@ -18,26 +18,20 @@ class PersonService(Service):
         """Основная функция генерации json по модели тела запроса."""
         body = self._build_query_body(params=params)
 
-        if params.query:
-            body = self._build_query_bool_must(body)
+        if params.dict():
 
-            match = self._build_query_match(
-                query=params.query,
-                match_field_type=es_query.FullNameField,
-                match_field_name='full_name'
-            )
+            body.query.bool.must = []
 
-            body.query.bool.must.append(
-                match
-            )
+            if params.query:
+                match = es_query.match_field(
+                    field_name='title',
+                    query=params.query
+                )
+
+                body.query.bool.must.append(match)
 
         return body.json(by_alias=True, exclude_none=True)
 
-    def _build_query_order(self, order: es_query.OrderEnum) -> es_query.FieldId:
-        """Функция генерации модели, для поля сортировки."""
-        return es_query.FieldId(
-            id=order
-        )
 
 
 @lru_cache()

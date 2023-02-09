@@ -12,6 +12,7 @@ from models.messages import Genre as Message
 from services import GenreService
 from services import cache
 from services import get_genre_service
+from .qparams import GenreParams
 
 
 router = APIRouter()
@@ -27,9 +28,10 @@ router = APIRouter()
 @cache()
 async def genre_list(
         genre_service: GenreService = Depends(get_genre_service),
-        message: Message = Depends()
+        message: Message = Depends(),
+        params: GenreParams = Depends(),
 ) -> list[Genre]:
-    genres = await genre_service.get_list()
+    genres = await genre_service.get_list(params)
     if not genres:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=message.not_found)
     return genres
@@ -52,5 +54,3 @@ async def genre_detail(
     if not genre:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=message.not_found)
     return genre
-
-

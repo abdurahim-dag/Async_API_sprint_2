@@ -60,3 +60,7 @@ class FilmParams(CommonParams):
         alias='filter[genre.name]',
         description='Фильтр по названию жанра.',
     ))
+
+
+class GenreParams(CommonParams):
+    sort: None = None

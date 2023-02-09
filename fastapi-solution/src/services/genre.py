@@ -14,8 +14,9 @@ class GenreService(Service):
     modelDetail = GenreDetail
     es_index = 'genres'
 
-    def build_search_query(self, params: ModelParams) -> None:
-        return None
+    def build_search_query(self, params: ModelParams | None) -> None:
+        body = self._build_query_body(params=params)
+        return body
 
 
 @lru_cache()
