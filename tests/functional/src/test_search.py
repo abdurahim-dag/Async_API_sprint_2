@@ -34,7 +34,7 @@ async def test_search_film_by_title(es_init, random_line, make_get_request):
 @pytest.mark.parametrize('es_init',[film_index], indirect=True)
 @pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_cached_search_film_(es_init, es_client, random_line, make_get_request):
+async def test_search_film_cached(es_init, es_client, random_line, make_get_request):
     """Тест поиска записи с учётом кеша в Redis."""
     # Выбираем рандомный фильм из исходных тестовых данных.
     film_dict = json.loads(random_line)

@@ -89,7 +89,7 @@ async def test_film_list(es_init, random_line, make_get_request):
 @pytest.mark.parametrize('es_init',[film_index], indirect=True)
 @pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_film_empty_list(es_init, random_line, make_get_request):
+async def test_film_page_num_over(es_init, random_line, make_get_request):
     """Тест вывода списка N фильмов, больше чем есть."""
     page_num = 1000
     page_size = 50
@@ -107,7 +107,7 @@ async def test_film_empty_list(es_init, random_line, make_get_request):
 @pytest.mark.parametrize('es_init',[film_index], indirect=True)
 @pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_film_empty_list(es_init, random_line, redis_client, make_get_request):
+async def test_film_page_size_minus(es_init, random_line, redis_client, make_get_request):
     """Тест вывода списка N фильмов, в отрицательную сторону."""
     page_num = 1
     page_size = -50
@@ -125,7 +125,7 @@ async def test_film_empty_list(es_init, random_line, redis_client, make_get_requ
 @pytest.mark.parametrize('es_init', [film_index], indirect=True)
 @pytest.mark.parametrize('random_line', [film_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_film_exception_sort_param(es_init, random_line, make_get_request):
+async def test_film_sort_param_422(es_init, random_line, make_get_request):
     """Проверка на exception, по не сортируемой параметру."""
     sort = '-title'
     params = {
@@ -146,3 +146,6 @@ async def test_film_exception_sort_param(es_init, random_line, make_get_request)
 
     assert response.status == 422
     assert response.json['detail'][0]['msg'] == 'value is not a valid uuid'
+
+genre_name
+genre_id

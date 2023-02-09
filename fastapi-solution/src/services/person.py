@@ -17,20 +17,17 @@ class PersonService(Service):
     def build_search_query(self, params: ModelParams) -> str | None:
         """Основная функция генерации json по модели тела запроса."""
         body = self._build_query_body(params=params)
+        query = body.query
+        b = query.bool
 
-        if params.dict():
+        if params.query:
+            match = es_query.match_field(
+                field_name='full_name',
+                query=params.query
+            )
+            b.must.append(match)
 
-            body.query.bool.must = []
-
-            if params.query:
-                match = es_query.match_field(
-                    field_name='title',
-                    query=params.query
-                )
-
-                body.query.bool.must.append(match)
-
-        return body.json(by_alias=True, exclude_none=True)
+        return body.json(by_alias=True, exclude_none=True, exclude_defaults=True)
 
 
 

@@ -77,12 +77,6 @@ def random_line(request):
     num_line = random.randrange(2,num_lines,2)
     return linecache.getline(str(fpath), num_line)
 
-@pytest.fixture(scope='session')
-def count_testdata(request):
-    fpath=request.param
-    num_lines = len(open(fpath, 'rt', encoding='utf-8').readlines()) - 1
-    return num_lines / 2
-
 
 @pytest_asyncio.fixture(scope='session')
 async def client_session(request):

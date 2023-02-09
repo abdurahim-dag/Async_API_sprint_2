@@ -18,39 +18,38 @@ class FilmService(Service):
     def build_search_query(self, params: ModelParams) -> str | None:
         """Основная функция генерации json по модели тела запроса."""
         body = self._build_query_body(params=params)
+        query = body.query
+        b = query.bool
 
-        if params.dict():
+        if params.query:
+            match = es_query.match_field(
+                field_name='title',
+                query=params.query
+            )
+            b.must.append(match)
 
-            if not body.query:
-                body.query = es_query.Query()
-            if not body.query.bool:
-                body.query.bool = es_query.QueryBool()
-            body.query.bool.must = []
-
-            if params.query:
-                match = es_query.match_field(
-                    field_name='title',
-                    query=params.query
-                )
-                body.query.bool.must.append(match)
+        if params.filter_genre or params.filter_genre_name:
+            nested = es_query.nested(
+                path = 'genre'
+            )
+            b.must.append(nested)
+            must = nested.nested.query.bool.must
 
             if params.filter_genre:
-                nested = es_query.nested(
-                    path = 'genre',
-                    field = 'genre_id',
-                    value = str(params.filter_genre)
+                match = es_query.match_field(
+                    field_name='genre.id',
+                    query=str(params.filter_genre)
                 )
-                body.query.bool.must.append(nested)
+                must.append(match)
 
             if params.filter_genre_name:
-                nested = es_query.nested(
-                    path = 'genre',
-                    field = 'genre_name',
-                    value = params.filter_genre_name
+                match = es_query.match_field(
+                    field_name='genre.name',
+                    query=params.filter_genre_name
                 )
-                body.query.bool.must.append(nested)
+                must.append(match)
 
-        return body.json(by_alias=True, exclude_none=True)
+        return body.json(by_alias=True, exclude_none=True, exclude_defaults=True)
 
 
 @lru_cache()

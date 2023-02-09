@@ -10,7 +10,7 @@ class IDSValues(BaseModel):
 # Поиск по id в filter
 class IDS(BaseModel):
     """filter: ..."""
-    ids: IDSValues
+    ids: IDSValues = IDSValues()
 
 
 def ids(values: list[str] = []) -> IDS:

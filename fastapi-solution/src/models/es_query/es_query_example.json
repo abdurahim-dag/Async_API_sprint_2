@@ -1,3 +1,4 @@
+"query":{"bool":{"filter":{"term":{"genre_id":"55c723c1-6d90-4a04-a44b-e9792040251a"}}}}}}]}},"sort":[{"imdb_rating":"desc"}],"size":50,"from":0}
 {
   "query": {
     "bool": {

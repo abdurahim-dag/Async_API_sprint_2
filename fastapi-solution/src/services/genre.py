@@ -16,7 +16,7 @@ class GenreService(Service):
 
     def build_search_query(self, params: ModelParams | None) -> None:
         body = self._build_query_body(params=params)
-        return body
+        return body.json(by_alias=True, exclude_none=True, exclude_defaults=True)
 
 
 @lru_cache()

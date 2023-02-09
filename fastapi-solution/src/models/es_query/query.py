@@ -4,5 +4,6 @@ from .qbool import QueryBool
 
 class Query(BaseModel):
     """query: ..."""
-    bool: QueryBool | None
+    bool: QueryBool = QueryBool()
+
 

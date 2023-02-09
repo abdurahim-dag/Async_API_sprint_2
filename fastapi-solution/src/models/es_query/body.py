@@ -9,10 +9,10 @@ def orjson_dumps(v, *, default):
 
 class Body(BaseModel):
     """Корневой элемент поиска."""
-    query: Query | None
-    sort: list | None
-    size: int = Field(default=0)
-    from_: int = Field(default=0, alias='from')
+    query: Query = Query()
+    sort: list = []
+    size: int = Field(default=-1)
+    from_: int = Field(default=-1, alias='from')
 
     class Config:
         json_loads = orjson.loads

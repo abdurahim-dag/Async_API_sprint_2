@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from .term import Term
+from .match import match_field
 from typing import ForwardRef
 
 QueryRef = ForwardRef("Query")
@@ -16,15 +16,9 @@ class Nested(BaseModel):
     """must: ..."""
     nested: NestedInner
 
-
-def nested(path: str, field: str, value) -> Nested:
+def nested(path: str) -> Nested:
     from .query import Query, QueryBool
-
-    query = Query(bool=QueryBool())
-    term = Term(
-        term={field: value}
-    )
-    query.bool.filter = term
+    query = Query(bool=QueryBool(must = []))
     nested_inner = NestedInner(
         path=path,
         query=query,

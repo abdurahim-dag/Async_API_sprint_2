@@ -67,21 +67,19 @@ async def test_genre_cache(es_init, es_client, random_line, redis_client, make_g
 
 
 @pytest.mark.parametrize('es_init',[genre_index], indirect=True)
-@pytest.mark.parametrize('count_testdata',[genre_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_genre_list(es_init, es_client, count_testdata, redis_client, make_get_request):
+async def test_genre_list(es_init, make_get_request):
     """Тест вывод списка N фильмов."""
     url = settings.api_endpoint_genres
     response = await make_get_request(url)
 
     assert response.status == 200
-    assert len(response.json) == count_testdata
+    assert len(response.json) == 25
 
 
 @pytest.mark.parametrize('es_init',[genre_index], indirect=True)
-@pytest.mark.parametrize('random_line',[genre_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_genre_empty_list(es_init, es_client, random_line, redis_client, make_get_request):
+async def test_genre_page_num_over(es_init, make_get_request):
     """Тест вывода списка N жанров, больше чем есть."""
     page_num = 1000
     page_size = 50
@@ -89,17 +87,16 @@ async def test_genre_empty_list(es_init, es_client, random_line, redis_client, m
         'page[number]': page_num,
         'page[size]': page_size,
     }
-    url = settings.api_endpoint_films
+    url = settings.api_endpoint_genres
     response = await make_get_request(url, params)
 
     assert response.status == 404
-    assert response.json['detail'] == 'films not found'
+    assert response.json['detail'] == 'genre not found'
 
 
 @pytest.mark.parametrize('es_init',[genre_index], indirect=True)
-@pytest.mark.parametrize('random_line',[genre_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_genre_exception(es_init, es_client, random_line, redis_client, make_get_request):
+async def test_genre_page_size_minus(es_init, make_get_request):
     """Тест вывода списка N жанров, в отрицательную сторону."""
     page_num = 1
     page_size = -50
@@ -107,9 +104,8 @@ async def test_genre_exception(es_init, es_client, random_line, redis_client, ma
         'page[number]': page_num,
         'page[size]': page_size,
     }
-    url = settings.api_endpoint_films
+    url = settings.api_endpoint_genres
     response = await make_get_request(url, params)
 
     assert response.status == 422
     assert response.json['detail'][0]['loc'] == ['query', 'page[size]']
-
