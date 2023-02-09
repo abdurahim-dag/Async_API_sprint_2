@@ -34,7 +34,7 @@ https://github.com/abdurahim-dag/Async_API_sprint_2
    - поиск с учётом кеша в Redis.
 
 # Разработчики:
-Рагим, Николай(BityutskiyNA).
+Рагим.
 
 # Структура приложения наружу:
 - Админка: http://localhost/admin

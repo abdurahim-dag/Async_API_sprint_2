@@ -3,13 +3,13 @@ import logging
 
 import pytest
 import json
-from functional.settings import film_test_settings, test_settings
+from functional.settings import film_index, settings
 from functional.models import Film
 
-@pytest.mark.parametrize('es_init',[film_test_settings], indirect=True)
-@pytest.mark.parametrize('random_line',[film_test_settings.data_file_path], indirect=True)
+@pytest.mark.parametrize('es_init',[film_index], indirect=True)
+@pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_search_film_by_title(es_init, es_client, random_line, redis_client, make_get_request):
+async def test_search_film_by_title(es_init, random_line, make_get_request):
     """Тест поиска записи по фразе и N записей."""
     # Выбираем рандомный фильм из исходных тестовых данных.
     film_dict = json.loads(random_line)
@@ -23,7 +23,7 @@ async def test_search_film_by_title(es_init, es_client, random_line, redis_clien
         'query': film.title,
     }
 
-    url = test_settings.api_endpoint_films + 'search'
+    url = settings.api_endpoint_films + 'search'
     response = await make_get_request(url, params=params)
     len_resp = len(response.json)
 
@@ -31,10 +31,10 @@ async def test_search_film_by_title(es_init, es_client, random_line, redis_clien
     assert len_resp == page_size or len_resp > 0
 
 
-@pytest.mark.parametrize('es_init',[film_test_settings], indirect=True)
-@pytest.mark.parametrize('random_line',[film_test_settings.data_file_path], indirect=True)
+@pytest.mark.parametrize('es_init',[film_index], indirect=True)
+@pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_cached_search_film_(es_init, es_client, random_line, redis_client, make_get_request):
+async def test_cached_search_film_(es_init, es_client, random_line, make_get_request):
     """Тест поиска записи с учётом кеша в Redis."""
     # Выбираем рандомный фильм из исходных тестовых данных.
     film_dict = json.loads(random_line)
@@ -44,7 +44,7 @@ async def test_cached_search_film_(es_init, es_client, random_line, redis_client
     params ={
         'query': film.title,
     }
-    url = test_settings.api_endpoint_films + 'search'
+    url = settings.api_endpoint_films + 'search'
 
     response = await make_get_request(url, params=params)
 
@@ -58,7 +58,7 @@ async def test_cached_search_film_(es_init, es_client, random_line, redis_client
     doc = {
         "doc": {'title': 'Unexpected'}
     }
-    await es_client.update(index=film_test_settings.index_name, id=film.id, body=doc)
+    await es_client.update(index=film_index.index_name, id=film.id, body=doc)
 
     # Вновь забираем фильм из API, ожидая, что мы берём его из кэша.
     response = await make_get_request(url, params=params)

@@ -11,7 +11,7 @@ import random
 import linecache
 from contextlib import closing
 from elasticsearch import AsyncElasticsearch
-from .settings import TestESIndexSettings, test_settings
+from .settings import ESIndexSettings, settings
 from typing import Generator
 
 @pytest.fixture(scope="session")
@@ -24,14 +24,14 @@ def event_loop():
 @pytest_asyncio.fixture(scope='session')
 async def es_client() -> Generator[AsyncElasticsearch, None, None]:
     """Создадим экземпляр асинхронного клиента ES, для всей сессии."""
-    client = AsyncElasticsearch(hosts=[test_settings.es_conn_str])
+    client = AsyncElasticsearch(hosts=[settings.es_conn_str])
     yield client
     await client.close()
 
 @pytest_asyncio.fixture(scope='session')
 async def es_init(es_client: AsyncElasticsearch, request):
     """Инициализация индекса."""
-    settings: TestESIndexSettings = request.param
+    settings: ESIndexSettings = request.param
     index_name = settings.index_name
     with closing(open(settings.schema_file_path, 'rt', encoding='utf-8')) as findex:
         body = findex.read()
@@ -63,7 +63,7 @@ async def es_init(es_client: AsyncElasticsearch, request):
 @pytest_asyncio.fixture(scope='session')
 async def redis_client():
     """Создадим экземпляр асинхронного клиента Redis, для всей сессии."""
-    async with redisio.from_url(test_settings.redis_conn_str,db=0) as client:
+    async with redisio.from_url(settings.redis_conn_str,db=settings.redis_db) as client:
         yield client
 
 @pytest.fixture(scope='session')
@@ -76,6 +76,12 @@ def random_line(request):
     num_lines = len(open(fpath, 'rt', encoding='utf-8').readlines()) - 1
     num_line = random.randrange(2,num_lines,2)
     return linecache.getline(str(fpath), num_line)
+
+@pytest.fixture(scope='session')
+def count_testdata(request):
+    fpath=request.param
+    num_lines = len(open(fpath, 'rt', encoding='utf-8').readlines()) - 1
+    return num_lines
 
 
 @pytest_asyncio.fixture(scope='session')

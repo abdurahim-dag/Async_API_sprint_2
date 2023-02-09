@@ -23,7 +23,7 @@
 	docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file ./.env.prod up -d
 
 0-start-tests:
-	docker compose -f docker-compose.yml -f docker-compose.tests.yml --env-file ./.env.dev up -d  --no-deps --build
+	docker compose -f docker-compose.tests.yml --env-file ./.env.dev up -d  --no-deps --build
 
 start-dev: 0-start-dev 0-check-pg-connection 1-django-migrate 3-django-create-admin 4-load-sqlite
 start-prod: 0-start-prod 0-check-pg-connection 1-django-migrate 2-django-collstatic 3-django-create-admin 4-load-sqlite
