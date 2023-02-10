@@ -1,4 +1,4 @@
-"""Тест ручки API, для фильма."""
+"""Тест ручки API поиска по фильмам."""
 import logging
 
 import pytest
@@ -6,7 +6,6 @@ import json
 from functional.settings import film_index, genre_index, settings
 from functional.models import Film, FilmDetail, GenreDetail
 
-@pytest.mark.parametrize('es_init',[film_index], indirect=True)
 @pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
 async def test_search_film_by_title(es_init, random_line, make_get_request):
@@ -31,7 +30,6 @@ async def test_search_film_by_title(es_init, random_line, make_get_request):
     assert len_resp == page_size or len_resp > 0
 
 
-@pytest.mark.parametrize('es_init',[film_index], indirect=True)
 @pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
 async def test_search_film_cached(es_init, es_client, random_line, make_get_request):
@@ -45,7 +43,6 @@ async def test_search_film_cached(es_init, es_client, random_line, make_get_requ
         'query': film.title,
     }
     url = settings.api_endpoint_films + 'search'
-
     response = await make_get_request(url, params=params)
 
     assert response.status == 200
@@ -67,23 +64,20 @@ async def test_search_film_cached(es_init, es_client, random_line, make_get_requ
     # Сравниваем результат с предыдущим
     assert film_api_first.dict() == film_api_second.dict()
 
-@pytest.mark.parametrize('es_init',[film_index], indirect=True)
 @pytest.mark.parametrize('random_line',[genre_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
 async def test_film_by_genre_name(es_init, random_line, make_get_request):
-    """Тест поиска конкретного фильма, с учётом кеша в Redis."""
-    # Выбираем рандомный фильм из исходных тестовых данных.
+    """Тест поиска конкретного фильма, по названию жанра."""
+    # Выбираем рандомный жанр из исходных тестовых данных.
     genre_dict = json.loads(random_line)
     genre = GenreDetail(**genre_dict)
 
-    # Получаем выбранный фильм из api, по id.
+    # Запрашиваем по имени жанра из api поиска фильмы.
     url = settings.api_endpoint_films + f"search/?filter[genre.name]={genre.name}"
     response = await make_get_request(url)
-
-    assert response.status == 200
-
     films = response.json
 
+    assert response.status == 200
     assert len(films) > 0
 
     for film in films:

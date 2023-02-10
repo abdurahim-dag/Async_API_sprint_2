@@ -80,8 +80,8 @@ https://github.com/abdurahim-dag/Async_API_sprint_2
    При запуске не забыть указать env-file: env.prod(такой же как env.example).
 
 # Порядок запуска tests:
-1. Создаём .env.dev на сонове .env.example. Редактируем .env.dev подводя его к dev(APP_USER=root)
-2. make start-tests
+1. Создаём .env.dev на основе .env.example. Редактируем .env.dev подводя его к dev(APP_USER=root)
+2. make start-tests(docker compose -f docker-compose.tests.yml --env-file ./.env.dev up --no-deps)
 3. Смотрим лог контейнера.
 4. docker compose down -v
 
