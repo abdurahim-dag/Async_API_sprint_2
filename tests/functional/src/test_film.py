@@ -146,6 +146,3 @@ async def test_film_sort_param_422(es_init, random_line, make_get_request):
 
     assert response.status == 422
     assert response.json['detail'][0]['msg'] == 'value is not a valid uuid'
-
-genre_name
-genre_id
