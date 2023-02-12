@@ -1,124 +1,100 @@
-"""Тест ручки API, для фильма."""
+"""Тест ручки API, для персон."""
 import json
 from http import HTTPStatus
 
 import pytest
 
-from functional.models import FilmDetail
-from functional.settings import film_index, settings
+from functional.models import PersonDetail
+from functional.settings import person_index, settings
 
 
-@pytest.mark.parametrize('es_init',[film_index], indirect=True)
-@pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
+@pytest.mark.parametrize('random_line',[person_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_film_by_id(es_init, random_line, make_get_request):
-    """Тест поиска конкретного фильма."""
-    # Выбираем рандомный фильм из исходных тестовых данных.
-    film_dict = json.loads(random_line)
-    film = FilmDetail(**film_dict)
-    url = settings.api_endpoint_films + str(film.id)
+async def test_person_by_id(es_init, random_line, make_get_request):
+    """Тест поиска конкретной персоны."""
+    # Выбираем рандомную персону из исходных тестовых данных.
+    person_dict = json.loads(random_line)
+    person = PersonDetail(**person_dict)
+    url = settings.api_endpoint_persons + str(person.id)
 
     # Получаем выбранный фильм из api, по id.
     response = await make_get_request(url)
-    film_api = FilmDetail(**response.json)
+    person_api = PersonDetail(**response.json)
 
     assert response.status == HTTPStatus.OK
-    assert film.dict() == film_api.dict()
+    assert person_api.dict() == person.dict()
 
 
-@pytest.mark.parametrize('es_init',[film_index], indirect=True)
-@pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
+@pytest.mark.parametrize('random_line',[person_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_film_cache(es_init, es_client, random_line, make_get_request):
-    """Тест поиска конкретного фильма, с учётом кеша в Redis."""
-    # Выбираем рандомный фильм из исходных тестовых данных.
-    film_dict = json.loads(random_line)
-    film = FilmDetail(**film_dict)
-    url = settings.api_endpoint_films + str(film.id)
+async def test_person_cache(es_init, es_client, random_line, make_get_request):
+    """Тест поиска конкретной персоны, с учётом кеша в Redis."""
+    # Выбираем рандомную персону из исходных тестовых данных.
+    person_dict = json.loads(random_line)
+    person = PersonDetail(**person_dict)
+    url = settings.api_endpoint_persons + str(person.id)
     doc = {
-        "doc": {'title': 'Unexpected'}
+        "doc": {'full_name': 'Unexpected'}
     }
 
-    # Получаем выбранный фильм из api, по id.
+    # Получаем выбранную персону из api, по id.
     response = await make_get_request(url)
+    person_api = PersonDetail(**response.json)
 
     assert response.status == HTTPStatus.OK
+    assert person.dict() == person_api.dict()
 
-    # Обновляем запись об этом фильме в ES.
-    await es_client.update(index=film_index.index_name, id=film.id, body=doc)
-
-    # Вновь забираем фильм из API, ожидая, ято мы берём его из кэша.
+    # Обновляем запись об этой персоне в ES.
+    await es_client.update(index=person_index.index_name, id=person.id, body=doc)
+    # Вновь забираем персону из API, ожидая, ято мы берём его из кэша.
     response = await make_get_request(url)
+    person_cached = PersonDetail(**response.json)
 
     assert response.status == HTTPStatus.OK
     assert response.headers.get("Cache-Control") is not None
     assert response.headers["Cache-Control"] is not None
 
-    film_cache_response = FilmDetail(**response.json)
-    # Для проверки забираем измененный фильм напрямую из ES.
+    # Для проверки забираем измененную персону напрямую из ES.
     url = settings.es_conn_str + '/'
-    url += film_index.index_name + '/_doc/'
-    url += str(film.id)
+    url += person_index.index_name + '/_doc/'
+    url += str(person.id)
 
     response = await make_get_request(url)
-    film_api = FilmDetail(**response.json['_source'])
+    person_api = PersonDetail(**response.json['_source'])
 
     assert response.status == HTTPStatus.OK
-    assert film.dict() == film_cache_response.dict()
-    assert film_api.title == 'Unexpected'
+    assert person.dict() == person_cached.dict()
+    assert person.dict() != person_api.dict()
+    assert person_api.name == 'Unexpected'
 
 
-@pytest.mark.parametrize('es_init',[film_index], indirect=True)
-@pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_film_list(es_init, random_line, make_get_request):
-    """Тест вывод списка N фильмов."""
-    # Проверка на вывод 20 фильмов.
+async def test_person_list(es_init, make_get_request):
+    """Тест вывод списка N персон."""
+    # Проверка на вывод 20 персон.
     page_num = 0
     page_size = 20
     params ={
         'page[number]': page_num,
         'page[size]': page_size,
     }
-    url = settings.api_endpoint_films
+    url = settings.api_endpoint_persons + 'search'
 
     response = await make_get_request(url, params)
 
     assert response.status == HTTPStatus.OK
     assert len(response.json) == page_size
 
-
-@pytest.mark.parametrize('es_init',[film_index], indirect=True)
-@pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_film_page_num_over(es_init, random_line, make_get_request):
-    """Тест вывода списка N фильмов, больше чем есть."""
-    page_num = 1000
-    page_size = 50
-    params ={
-        'page[number]': page_num,
-        'page[size]': page_size,
-    }
-    url = settings.api_endpoint_films
-
-    response = await make_get_request(url, params)
-
-    assert response.status == HTTPStatus.NOT_FOUND
-    assert response.json['detail'] == 'films not found'
-
-
-@pytest.mark.parametrize('es_init',[film_index], indirect=True)
-@pytest.mark.parametrize('random_line',[film_index.data_file_path], indirect=True)
-@pytest.mark.asyncio
-async def test_film_page_size_minus(es_init, random_line, make_get_request):
-    """Тест вывода списка N фильмов, в отрицательную сторону."""
+async def test_film_page_size_minus(es_init, make_get_request):
+    """Тест вывода списка N персон, в отрицательную сторону."""
     page_num = 1
     page_size = -50
     params ={
         'page[number]': page_num,
         'page[size]': page_size,
     }
-    url = settings.api_endpoint_films
+    url = settings.api_endpoint_persons + 'search'
 
     response = await make_get_request(url, params)
 
@@ -126,28 +102,32 @@ async def test_film_page_size_minus(es_init, random_line, make_get_request):
     assert response.json['detail'][0]['loc'] == ['query', 'page[size]']
 
 
-@pytest.mark.parametrize('es_init', [film_index], indirect=True)
-@pytest.mark.parametrize('random_line', [film_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_film_sort_param_422(es_init, random_line, make_get_request):
+async def test_person_sort_param_422(es_init, make_get_request):
     """Проверка на exception, по не сортируемой параметру."""
     sort = '-title'
     params = {
         'sort': sort,
     }
-    url = settings.api_endpoint_films
+    url = settings.api_endpoint_persons + 'search'
 
     response = await make_get_request(url, params)
 
     assert response.status == HTTPStatus.UNPROCESSABLE_ENTITY
-    assert response.json['detail'][0]['msg'] == "value is not a valid enumeration member; permitted: 'imdb_rating', '-imdb_rating'"
+    assert "value is not a valid" in response.json['detail'][0]['msg']
 
-    filter_genre = 'incorrect uuid'
-    params = {
-        'filter[genre]': filter_genre,
-    }
 
-    response = await make_get_request(url, params)
+@pytest.mark.parametrize('random_line',[person_index.data_file_path], indirect=True)
+@pytest.mark.asyncio
+async def test_person_film(es_init, es_client, random_line, make_get_request):
+    """Тест поиска конкретной персоны."""
+    # Выбираем рандомную персону из исходных тестовых данных.
+    person_dict = json.loads(random_line)
+    person = PersonDetail(**person_dict)
+    url = settings.api_endpoint_persons + f"{str(person.id)}/film"
 
-    assert response.status == HTTPStatus.UNPROCESSABLE_ENTITY
-    assert response.json['detail'][0]['msg'] == 'value is not a valid uuid'
+    # Получаем выбранную персону из api, по id.
+    response = await make_get_request(url)
+
+    assert response.status == HTTPStatus.OK
+    assert len(response.json) > 0

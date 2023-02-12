@@ -13,7 +13,7 @@ async def client_session(redis_client, request):
 async def make_get_request(client_session):
     """Собственно запрос к API посредством aiohttp сессии."""
     async def go(url, params=None):
-        async with client_session.get(url=url, params=params) as response:
+        async with client_session.get(url=url, params=params, allow_redirects=True) as response:
             print(url)
             response.json = await response.json()
             return response

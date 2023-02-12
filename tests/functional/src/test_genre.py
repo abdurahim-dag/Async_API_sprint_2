@@ -1,4 +1,4 @@
-"""Тест ручки API, для фильма."""
+"""Тест ручек API, для жанров."""
 import json
 from http import HTTPStatus
 
@@ -8,17 +8,16 @@ from functional.models import GenreDetail
 from functional.settings import genre_index, settings
 
 
-@pytest.mark.parametrize('es_init',[genre_index], indirect=True)
 @pytest.mark.parametrize('random_line',[genre_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
-async def test_genre_by_id(es_init, es_client, random_line, make_get_request):
+async def test_genre_by_id(es_init, random_line, make_get_request):
     """Тест поиска конкретного жанра."""
     # Выбираем рандомный жанр из исходных тестовых данных.
     genre_dict = json.loads(random_line)
     genre = GenreDetail(**genre_dict)
     url = settings.api_endpoint_genres + str(genre.id)
 
-    # Получаем выбранный фильм из api, по id.
+    # Получаем выбранный жанр из api, по id.
     response = await make_get_request(url)
     genre_api = GenreDetail(**response.json)
 
@@ -26,7 +25,6 @@ async def test_genre_by_id(es_init, es_client, random_line, make_get_request):
     assert genre.dict() == genre_api.dict()
 
 
-@pytest.mark.parametrize('es_init',[genre_index], indirect=True)
 @pytest.mark.parametrize('random_line',[genre_index.data_file_path], indirect=True)
 @pytest.mark.asyncio
 async def test_genre_cache(es_init, es_client, random_line, make_get_request):
@@ -34,21 +32,21 @@ async def test_genre_cache(es_init, es_client, random_line, make_get_request):
     # Выбираем рандомный жанр из исходных тестовых данных.
     genre_dict = json.loads(random_line)
     genre = GenreDetail(**genre_dict)
-    # Получаем выбранный фильм из api, по id.
     url = settings.api_endpoint_genres + str(genre.id)
     doc = {
         "doc": {'name': 'Unexpected'}
     }
 
+    # Получаем выбранный жанр из api, по id.
     response = await make_get_request(url)
     genre_api = GenreDetail(**response.json)
 
     assert response.status == HTTPStatus.OK
     assert genre.dict() == genre_api.dict()
 
-    # Обновляем запись об этом фильме в ES.
+    # Обновляем запись об этом жанре в ES.
     await es_client.update(index=genre_index.index_name, id=genre.id, body=doc)
-    # Вновь забираем фильм из API, ожидая, ято мы берём его из кэша.
+    # Вновь забираем жанр из API, ожидая, что мы берём его из кэша.
     response = await make_get_request(url)
     genre_cached = GenreDetail(**response.json)
 
@@ -56,9 +54,9 @@ async def test_genre_cache(es_init, es_client, random_line, make_get_request):
     assert response.headers.get("Cache-Control") is not None
     assert response.headers["Cache-Control"] is not None
 
-    # Для проверки забираем измененный фильм напрямую из ES.
     url = f"{settings.es_conn_str}/{genre_index.index_name}/_doc/{str(genre.id)}"
 
+    # Для проверки забираем измененный жанр напрямую из ES.
     response = await make_get_request(url)
     genre_es = GenreDetail(**response.json['_source'])
 
@@ -67,10 +65,9 @@ async def test_genre_cache(es_init, es_client, random_line, make_get_request):
     assert genre_es.name == 'Unexpected'
 
 
-@pytest.mark.parametrize('es_init',[genre_index], indirect=True)
 @pytest.mark.asyncio
 async def test_genre_list(es_init, make_get_request):
-    """Тест вывод списка N фильмов."""
+    """Тест вывод списка N жанров."""
     url = settings.api_endpoint_genres
 
     response = await make_get_request(url)
@@ -79,7 +76,6 @@ async def test_genre_list(es_init, make_get_request):
     assert len(response.json) == 25
 
 
-@pytest.mark.parametrize('es_init',[genre_index], indirect=True)
 @pytest.mark.asyncio
 async def test_genre_page_num_over(es_init, make_get_request):
     """Тест вывода списка N жанров, больше чем есть."""
@@ -97,7 +93,6 @@ async def test_genre_page_num_over(es_init, make_get_request):
     assert response.json['detail'] == 'genre not found'
 
 
-@pytest.mark.parametrize('es_init',[genre_index], indirect=True)
 @pytest.mark.asyncio
 async def test_genre_page_size_minus(es_init, make_get_request):
     """Тест вывода списка N жанров, в отрицательную сторону."""
