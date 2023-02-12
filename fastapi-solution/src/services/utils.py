@@ -63,7 +63,7 @@ class Service(ABC):
             values = [
                 str(_id) for _id in params.ids
             ]
-            query.bool.filter = es_query.ids(values=values)
+            query.bool.filter.append(es_query.ids(values=values))
 
         if params.sort:
             if params.sort.startswith('-'):

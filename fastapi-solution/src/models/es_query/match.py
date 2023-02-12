@@ -13,7 +13,7 @@ class Match(BaseModel):
     match: dict = {}
 
 
-def match_field(field_name: str, query: str):
-    mfq = MatchFieldQuery(query=query, fuzziness='AUTO')
+def match_field(field_name: str, query: str, fuzziness: str = 'AUTO'):
+    mfq = MatchFieldQuery(query=query, fuzziness=fuzziness)
     m = Match(match={field_name: mfq})
     return m

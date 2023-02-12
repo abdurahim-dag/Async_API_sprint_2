@@ -18,6 +18,8 @@ services:
         hard: -1
     volumes:
       - dev-es-data-test-01:/usr/share/elasticsearch/data
+    networks:
+      - test-net
 
   fastapi:
     container_name: fastapi
@@ -30,6 +32,8 @@ services:
       - es01
     volumes:
       - ./fastapi-solution/src:/app
+    networks:
+      - test-net
     env_file: .env.dev
     expose:
       - "8080"
@@ -39,6 +43,8 @@ services:
     command: redis-server
     container_name: redis
     hostname: redis
+    networks:
+      - test-net
     expose:
       - "6379"
 
@@ -48,9 +54,14 @@ services:
     container_name: tests
     volumes:
       - ./tests/functional:/functional
+    networks:
+      - test-net
     env_file: .env.dev
     entrypoint: >
       /bin/bash -c "pytest /functional"    
 
 volumes:
   dev-es-data-test-01:
+
+networks:
+  test-net:

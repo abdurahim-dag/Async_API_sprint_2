@@ -7,4 +7,4 @@ from .nested import Nested
 class QueryBool(BaseModel):
     """bool: ..."""
     must: list[Match| Nested | None ] = []
-    filter: Term | IDS | None = None
+    filter: Term | IDS | None = []

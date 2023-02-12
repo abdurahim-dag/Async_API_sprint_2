@@ -15,7 +15,7 @@ services:
       - ./app:/app
     env_file: .env.dev
     ports:
-      - "8000:8080"
+      - "8001:8080"
     restart: unless-stopped
 
   swagger-eidtor:

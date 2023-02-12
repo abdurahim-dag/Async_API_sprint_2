@@ -33,21 +33,20 @@ class FilmService(Service):
                 path = 'genre'
             )
             b.must.append(nested)
-            must = nested.nested.query.bool.must
+            nested_bool = nested.nested.query.bool
 
             if params.filter_genre:
-                match = es_query.match_field(
-                    field_name='genre.id',
-                    query=str(params.filter_genre)
+                term = es_query.Term(
+                    term = {'genre.id': params.filter_genre}
                 )
-                must.append(match)
+                nested_bool.filter.append(term)
 
             if params.filter_genre_name:
                 match = es_query.match_field(
                     field_name='genre.name',
-                    query=params.filter_genre_name
+                    query=str(params.filter_genre_name)
                 )
-                must.append(match)
+                nested_bool.must.append(match)
 
         return body.json(by_alias=True, exclude_none=True, exclude_defaults=True)
 
