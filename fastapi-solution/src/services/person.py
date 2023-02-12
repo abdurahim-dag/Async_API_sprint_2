@@ -1,11 +1,11 @@
 from functools import lru_cache
 
+from db.elastic import get_elastic
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
-
-from db.elastic import get_elastic
 from models import es_query, PersonDetail
 from services.utils import Service
+
 from .qparams import ModelParams
 
 

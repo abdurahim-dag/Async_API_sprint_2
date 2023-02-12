@@ -1,13 +1,13 @@
 from functools import lru_cache
 
+import models.es_query as es_query
+from db.elastic import get_elastic
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
-
-from db.elastic import get_elastic
 from models import Film, FilmDetail
 from services.utils import Service
+
 from .qparams import ModelParams
-import models.es_query as es_query
 
 
 class FilmService(Service):

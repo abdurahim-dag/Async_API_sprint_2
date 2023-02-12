@@ -3,10 +3,10 @@ from abc import ABC
 from typing import Any
 from uuid import UUID
 
-from elasticsearch import AsyncElasticsearch, NotFoundError
-
-from models import Film, FilmDetail, Genre, GenreDetail, Person, PersonDetail
 import models.es_query as es_query
+from elasticsearch import AsyncElasticsearch, NotFoundError
+from models import Film, FilmDetail, Genre, GenreDetail, Person, PersonDetail
+
 from .qparams import ModelParams
 
 

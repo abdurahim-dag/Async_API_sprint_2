@@ -50,9 +50,7 @@ services:
       - ./tests/functional:/functional
     env_file: .env.dev
     entrypoint: >
-      /bin/bash -c "python -u utils/wait_for_es.py
-      && python -u utils/wait_for_redis.py
-      && pytest /functional"    
+      /bin/bash -c "pytest /functional"    
 
 volumes:
   dev-es-data-test-01:

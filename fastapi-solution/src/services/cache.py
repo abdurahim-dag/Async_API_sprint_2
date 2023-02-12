@@ -3,11 +3,9 @@ import pickle
 from functools import wraps
 from typing import Callable, Optional
 
+import db.redis as redis
 from fastapi import Request, Response
 from fastapi.concurrency import run_in_threadpool
-
-import db.redis as redis
-
 
 CACHE_EXPIRE_IN_SECONDS = 20 * 1
 

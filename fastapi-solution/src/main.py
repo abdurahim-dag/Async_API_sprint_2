@@ -19,7 +19,7 @@ from db import redis
 
 
 app = FastAPI(
-    title=config.PROJECT_NAME,
+    title=config.project_name,
     docs_url='/api/openapi',
     openapi_url='/api/openapi.json',
     default_response_class=ORJSONResponse,
@@ -28,7 +28,7 @@ app = FastAPI(
 
 @app.on_event('startup')
 async def startup():
-    url = f"redis://{config.REDIS_HOST}:{config.REDIS_PORT}"
+    url = f"redis://{config.redis_host}:{config.redis_port}/{config.redis_db}"
 
     # Run 3 retries with exponential backoff strategy
     retry = Retry(ExponentialBackoff(), 3)
@@ -39,7 +39,7 @@ async def startup():
         retry_on_error=[BusyLoadingError, ConnectionError, TimeoutError]
     )
 
-    elastic.es = AsyncElasticsearch(hosts=[f'{config.ELASTIC_HOST}:{config.ELASTIC_PORT}'])
+    elastic.es = AsyncElasticsearch(hosts=[f'{config.elastic_host}:{config.elastic_port}'])
 
 
 @app.on_event('shutdown')
@@ -54,7 +54,7 @@ app.include_router(persons.router, prefix='/api/v1/persons', tags=['persons'])
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=config.ORIGINS,
+    allow_origins=config.origins,
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
