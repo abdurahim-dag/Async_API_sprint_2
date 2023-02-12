@@ -31,6 +31,9 @@ class CommonSettings(BaseSettings):
     def api_endpoint_genres(self) -> str:
         return f"http://{self.api_host}:{self.api_port}/api/v1/genres/"
 
+    @property
+    def api_endpoint_persons(self) -> str:
+        return f"http://{self.api_host}:{self.api_port}/api/v1/persons/"
 
 class ESIndexSettings(BaseModel):
     """Модель настроек, для конкретного индекса."""
@@ -72,3 +75,25 @@ genre_index = ESIndexSettings(
         )
     )
 )
+
+person_index = ESIndexSettings(
+    index_name='persons',
+    schema_file_path=Path(
+        PurePath(
+            'testdata',
+            'es_schema_persons.json'
+        )
+    ),
+    data_file_path=Path(
+        PurePath(
+            'testdata',
+            'persons.json'
+        )
+    )
+)
+
+indexes = [
+    film_index,
+    genre_index,
+    person_index,
+]
